@@ -1,0 +1,42 @@
+{
+  "classes": [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "q",
+    "r",
+    "s",
+    "t",
+    "u",
+    "v",
+    "w",
+    "x",
+    "y",
+    "z"
+  ],
+  "sample_rate": 44100,
+  "n_samples": 11025,
+  "n_fft": 1024,
+  "hop_length": 225,
+  "n_mels": 64,
+  "feature_type": "librosa log-mel power spectrogram",
+  "db_reference": "per-sample maximum",
+  "input_shape": [
+    64,
+    50,
+    1
+  ]
+}
