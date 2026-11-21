@@ -1,0 +1,17 @@
+run_name: keystroke_only_phase_320_v1
+kind: carrier_aware
+seed: 42
+data_seed: 42
+reshuffle_each_iteration: true
+model: artifacts/models/keystroke_cnn.keras
+dataset: artifacts/models/keystroke_dataset.npz
+batch_size: 32
+epochs: 320
+steps_per_epoch: 12
+learning_rate: 0.00001
+rms_budget: 0.0012
+peak_budget: 0.0024
+init_mode: zero
+output_dir: artifacts/runs
+carriers: {}
+carrier_config: {}
