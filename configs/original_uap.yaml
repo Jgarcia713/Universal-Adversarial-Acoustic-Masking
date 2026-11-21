@@ -1,0 +1,12 @@
+run_name: original_uap_epsilon_001_v1
+kind: original
+seed: 42
+data_seed: 42
+reshuffle_each_iteration: true
+model: artifacts/models/keystroke_cnn.keras
+dataset: artifacts/models/keystroke_dataset.npz
+batch_size: 32
+epochs: 30
+epsilon: 0.01
+step_size: 0.001
+output_dir: artifacts/runs

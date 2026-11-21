@@ -1,0 +1,25 @@
+seed: 20261116
+model: artifacts/models/keystroke_cnn.keras
+dataset: artifacts/models/keystroke_dataset.npz
+keystroke_split: test  # HISTORICAL DEVELOPMENT SET; NOT a pristine final test
+carrier_split: val
+batch_size: 32
+repeats: 30
+playback_scale: 0.90
+noise_rms: 0.0012
+noise_peak: 0.0024
+clip_mixtures: false  # Preserve paired notebook numbers. New controlled tests: true.
+output_dir: artifacts/evaluation
+carriers: {rain: artifacts/carriers/rain.wav, fan: artifacts/carriers/fan.wav, wind: artifacts/carriers/wind.wav}
+carrier_config:
+  rain: {carrier_rms: 0.005, residual_gain: 1.0}
+  fan: {carrier_rms: 0.010, residual_gain: 0.75}
+  wind: {carrier_rms: 0.010, residual_gain: 1.0}
+residuals:
+  original_uap:
+    path: artifacts/masks/uap_epsilon_001.npy
+    match_budget: true
+  keystroke_only: {bank: artifacts/masks/residual_bank.npz, key: keystroke_only_phase_320}
+  rain_baseline: {bank: artifacts/masks/residual_bank.npz, key: rain_phase}
+  multi_warm: {bank: artifacts/masks/residual_bank.npz, key: multi_warm}
+  multi_scratch: {bank: artifacts/masks/residual_bank.npz, key: multi_scratch}

@@ -1,4 +1,13 @@
 input-sounds/
+.pytest_cache/
+*.py[cod]
+*.egg-info/
+artifacts/evaluation
+artifacts/runs
+!artifacts/.gitkeep
+*.wav
+!tests/fixtures/*.wav
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

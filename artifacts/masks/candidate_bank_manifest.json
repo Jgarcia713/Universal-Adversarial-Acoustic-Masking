@@ -1,0 +1,263 @@
+{
+  "sample_rate_hz": 44100,
+  "samples_per_waveform": 11025,
+  "candidate_bank_sha256": "f99e4199d3a8bcb4eee7da781a95128c5fb4f679f21e23ae8cee1e716407401a",
+  "candidates": {
+    "zero_101": {
+      "initialization": "zero",
+      "seed": 101,
+      "epochs": 320,
+      "residual_sha256": "2922a436293033eb1a8549882cdff4a57ab0421caf3226dd1e003e25e46552d0",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_101",
+      "reused_from": "artifacts\\runs\\mask_bank_continuation\\zero_101"
+    },
+    "zero_202": {
+      "initialization": "zero",
+      "seed": 202,
+      "epochs": 320,
+      "residual_sha256": "da8ecf4fc9df6d9309ce9e39f12d596e805f1b2866f6d06f0fb74d1e917661ec",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_202",
+      "reused_from": "artifacts\\runs\\mask_bank_continuation\\zero_202"
+    },
+    "zero_303": {
+      "initialization": "zero",
+      "seed": 303,
+      "epochs": 320,
+      "residual_sha256": "f7439c31a4f30bb954ed029cbb82eb4358e52134652ed00ed3ef77fe11852d04",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_303",
+      "reused_from": "artifacts\\runs\\mask_bank_continuation\\zero_303"
+    },
+    "zero_404": {
+      "initialization": "zero",
+      "seed": 404,
+      "epochs": 320,
+      "residual_sha256": "249f261659960133c8db109074bdaea242a2d6b82d3e2dd507dca4ea428ef4a1",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_404",
+      "reused_from": "artifacts\\runs\\mask_bank_continuation\\zero_404"
+    },
+    "zero_1101": {
+      "initialization": "zero",
+      "seed": 1101,
+      "epochs": 320,
+      "residual_sha256": "cfd8579f566a132bce6e933e269706d8ef733402a4c3692761c160dbec970f7c",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_1101",
+      "reused_from": null
+    },
+    "zero_1102": {
+      "initialization": "zero",
+      "seed": 1102,
+      "epochs": 320,
+      "residual_sha256": "eae58f775a8a68125dc3996e55727adde60f5f2f35313c1be4c98797173fe22e",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_1102",
+      "reused_from": null
+    },
+    "zero_1103": {
+      "initialization": "zero",
+      "seed": 1103,
+      "epochs": 320,
+      "residual_sha256": "b3040e311ff3c55a0bc93b210fe736525298e5387624d886ac35f8650796fba4",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_1103",
+      "reused_from": null
+    },
+    "zero_1104": {
+      "initialization": "zero",
+      "seed": 1104,
+      "epochs": 320,
+      "residual_sha256": "a3b451ffb0f759a6320b7f2f48ba1f7481f6ee114745a28100a9d3ff6c7fe67c",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_1104",
+      "reused_from": null
+    },
+    "zero_1105": {
+      "initialization": "zero",
+      "seed": 1105,
+      "epochs": 320,
+      "residual_sha256": "cab042d385dfbf136730af39cb7e37d762eb9c4e47d21a53b85227cb79005e1f",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_1105",
+      "reused_from": null
+    },
+    "zero_1106": {
+      "initialization": "zero",
+      "seed": 1106,
+      "epochs": 320,
+      "residual_sha256": "fb6463f58ecd87a7e92c8564165b65c595a00db35e545ca7e0eaaa533408aad0",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_1106",
+      "reused_from": null
+    },
+    "zero_1107": {
+      "initialization": "zero",
+      "seed": 1107,
+      "epochs": 320,
+      "residual_sha256": "44e5f2adf74da2b94ca2bc8d4a0e012ba5e35f32f02ea70930531db09870575c",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_1107",
+      "reused_from": null
+    },
+    "zero_1108": {
+      "initialization": "zero",
+      "seed": 1108,
+      "epochs": 320,
+      "residual_sha256": "1cea1049ba9615c6e1116b3d022cf75370d2e4d50c59fe6e9be68d67fa7dfaa9",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_1108",
+      "reused_from": null
+    },
+    "zero_1109": {
+      "initialization": "zero",
+      "seed": 1109,
+      "epochs": 320,
+      "residual_sha256": "79c6542673e23797ea6e7048c97df72db97242c0301b8d835436c0e3d3e34068",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_1109",
+      "reused_from": null
+    },
+    "zero_1110": {
+      "initialization": "zero",
+      "seed": 1110,
+      "epochs": 320,
+      "residual_sha256": "8f91fdcc234809aa156743a6114c58751d28505fd8a1dbdac7d45c92547f1b13",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_1110",
+      "reused_from": null
+    },
+    "zero_1111": {
+      "initialization": "zero",
+      "seed": 1111,
+      "epochs": 320,
+      "residual_sha256": "37c2427fec2a0816837c3d3bc5d6756ed22ca4a9a8790332110ae8a0df9df263",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_1111",
+      "reused_from": null
+    },
+    "zero_1112": {
+      "initialization": "zero",
+      "seed": 1112,
+      "epochs": 320,
+      "residual_sha256": "86bd75b6b63550c90ab8d99e0520322af30d03c48c99bf8f5b11f6d46f9517f4",
+      "run": "artifacts\\runs\\mask_bank_full_320\\zero_1112",
+      "reused_from": null
+    },
+    "random_101": {
+      "initialization": "random",
+      "seed": 101,
+      "epochs": 320,
+      "residual_sha256": "a26a13766a919d0f624e985e662cc2f6c651c5ffc0170643b055e8aa2c9cc57d",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_101",
+      "reused_from": "artifacts\\runs\\mask_bank_continuation\\random_101"
+    },
+    "random_202": {
+      "initialization": "random",
+      "seed": 202,
+      "epochs": 320,
+      "residual_sha256": "cb34fafc5362a48eecac77bb7e703601f93fc38a0bbe181844d62deddc398f37",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_202",
+      "reused_from": "artifacts\\runs\\mask_bank_continuation\\random_202"
+    },
+    "random_303": {
+      "initialization": "random",
+      "seed": 303,
+      "epochs": 320,
+      "residual_sha256": "afe7fd6323e37f197a202075ebb1e3e992825a28f6153f5624e5f87e0bbd4a80",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_303",
+      "reused_from": "artifacts\\runs\\mask_bank_continuation\\random_303"
+    },
+    "random_404": {
+      "initialization": "random",
+      "seed": 404,
+      "epochs": 320,
+      "residual_sha256": "d709a399885ae70abc28ca5c3755fdf2ce18f916573139b738f51f9373f73152",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_404",
+      "reused_from": "artifacts\\runs\\mask_bank_continuation\\random_404"
+    },
+    "random_2101": {
+      "initialization": "random",
+      "seed": 2101,
+      "epochs": 320,
+      "residual_sha256": "c1ab8e869a92be1565c01a9acef6141109760a3da4c229deb96700caf5f3918b",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_2101",
+      "reused_from": null
+    },
+    "random_2102": {
+      "initialization": "random",
+      "seed": 2102,
+      "epochs": 320,
+      "residual_sha256": "07d90421953a89b55b2991b601987a67c95f5af200d14936f106cfe1f6dfdd00",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_2102",
+      "reused_from": null
+    },
+    "random_2103": {
+      "initialization": "random",
+      "seed": 2103,
+      "epochs": 320,
+      "residual_sha256": "faaed78baa2eb1ba39732a5c33b0c1b0251b4e01ba3d4f060113869155f6746d",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_2103",
+      "reused_from": null
+    },
+    "random_2104": {
+      "initialization": "random",
+      "seed": 2104,
+      "epochs": 320,
+      "residual_sha256": "6b7776a42bf0a6b285ad8bdd5b4046c1a14e89372ab7cbc757f76511e7fa98fb",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_2104",
+      "reused_from": null
+    },
+    "random_2105": {
+      "initialization": "random",
+      "seed": 2105,
+      "epochs": 320,
+      "residual_sha256": "f4b92d460ab36968b714fbdd148c0ecebf7ca63e8256a84c87bd9a74bde411b1",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_2105",
+      "reused_from": null
+    },
+    "random_2106": {
+      "initialization": "random",
+      "seed": 2106,
+      "epochs": 320,
+      "residual_sha256": "a08ba7eb70df520072d1294f25d57042830eace2ddbb9f5ec63a31bdf3f79450",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_2106",
+      "reused_from": null
+    },
+    "random_2107": {
+      "initialization": "random",
+      "seed": 2107,
+      "epochs": 320,
+      "residual_sha256": "344f2ae9eb2ee5ae7bad619d6958e2a87bd65463c8b8618a16ef71bdc7e48f65",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_2107",
+      "reused_from": null
+    },
+    "random_2108": {
+      "initialization": "random",
+      "seed": 2108,
+      "epochs": 320,
+      "residual_sha256": "acf42c1e049efad8a1fbfeb70e53d923c05b7413945ef93ac2052187cd2f33e0",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_2108",
+      "reused_from": null
+    },
+    "random_2109": {
+      "initialization": "random",
+      "seed": 2109,
+      "epochs": 320,
+      "residual_sha256": "c9f166028b429bcbf6c6a290227faf655d105729d1d37b7f53adb6d427291894",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_2109",
+      "reused_from": null
+    },
+    "random_2110": {
+      "initialization": "random",
+      "seed": 2110,
+      "epochs": 320,
+      "residual_sha256": "3f7004286d526643847e529b9586b9baec3b0f167a75c342c61966d9cdcba31b",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_2110",
+      "reused_from": null
+    },
+    "random_2111": {
+      "initialization": "random",
+      "seed": 2111,
+      "epochs": 320,
+      "residual_sha256": "73ce3fe83957047c0ae828ce396760967e2749fb3229dd7b1ac8190b4dd75fb1",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_2111",
+      "reused_from": null
+    },
+    "random_2112": {
+      "initialization": "random",
+      "seed": 2112,
+      "epochs": 320,
+      "residual_sha256": "e14999467d6df9b7c33539a61873bb2293dd0736c03752411dea7cb9f0737308",
+      "run": "artifacts\\runs\\mask_bank_full_320\\random_2112",
+      "reused_from": null
+    }
+  }
+}

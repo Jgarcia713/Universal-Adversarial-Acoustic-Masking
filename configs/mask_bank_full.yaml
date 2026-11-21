@@ -1,0 +1,19 @@
+training_config: configs/multi_scratch.yaml
+evaluation_config: configs/evaluation.yaml
+output_dir: artifacts/runs/mask_bank_full_320
+reuse_from: artifacts/runs/mask_bank_continuation
+export_candidates: true
+reference_key: multi_scratch
+reference_run: artifacts/runs/multi_scratch_320_v1/residual.npy
+seeds_by_initialization:
+  zero: [101, 202, 303, 404, 1101, 1102, 1103, 1104, 1105, 1106, 1107, 1108, 1109, 1110, 1111, 1112]
+  random: [101, 202, 303, 404, 2101, 2102, 2103, 2104, 2105, 2106, 2107, 2108, 2109, 2110, 2111, 2112]
+epochs: 320
+evaluation_repeats: 8
+initialization_rms: 0.0003
+accuracy_tolerance_pp: 2.0
+loudness_scales: [1.0]
+duplicate_correlation: 0.90
+duplicate_spectral_distance: 0.05
+duplicate_prediction_disagreement: 0.05
+min_admitted_for_expansion: 6

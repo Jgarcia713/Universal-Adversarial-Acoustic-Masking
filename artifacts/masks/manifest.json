@@ -1,0 +1,169 @@
+{
+  "created_utc": "2026-11-16T09:14:27.862433+00:00",
+  "sample_rate": 44100,
+  "n_samples": 11025,
+  "duration_seconds": 0.25,
+  "waveforms": {
+    "rain_phase": {
+      "training_carrier": "rain",
+      "training_carrier_rms": 0.003,
+      "phase_robust": true,
+      "description": "Original phase-robust rain residual",
+      "rms": 0.0012000000569969416,
+      "peak": 0.0023970052134245634,
+      "dtype": "float32"
+    },
+    "fan_010": {
+      "training_carrier": "fan",
+      "training_carrier_rms": 0.01,
+      "target_residual_rms": 0.0009,
+      "phase_robust": true,
+      "rms": 0.0006823675357736647,
+      "peak": 0.0017999999690800905,
+      "dtype": "float32"
+    },
+    "wind_010": {
+      "training_carrier": "wind",
+      "training_carrier_rms": 0.01,
+      "target_residual_rms": 0.0012,
+      "phase_robust": true,
+      "rms": 0.0005440603708848357,
+      "peak": 0.002085059881210327,
+      "dtype": "float32"
+    },
+    "fan_003": {
+      "training_carrier": "fan",
+      "training_carrier_rms": 0.003,
+      "target_residual_rms": 0.0003,
+      "phase_robust": true,
+      "rms": 0.00030000004335306585,
+      "peak": 0.0005981430877000093,
+      "dtype": "float32"
+    },
+    "wind_003": {
+      "training_carrier": "wind",
+      "training_carrier_rms": 0.003,
+      "target_residual_rms": 0.0003,
+      "phase_robust": true,
+      "rms": 0.0003000000142492354,
+      "peak": 0.0005983187002129853,
+      "dtype": "float32"
+    },
+    "multi_warm": {
+      "training_carriers": [
+        "rain",
+        "fan",
+        "wind"
+      ],
+      "carrier_config": {
+        "rain": {
+          "carrier_rms": 0.005,
+          "residual_gain": 1.0
+        },
+        "fan": {
+          "carrier_rms": 0.01,
+          "residual_gain": 0.75
+        },
+        "wind": {
+          "carrier_rms": 0.01,
+          "residual_gain": 1.0
+        }
+      },
+      "initialization": "rain_phase",
+      "phase_robust": true,
+      "epochs": 80,
+      "learning_rate": 1e-05,
+      "steps_per_epoch": 12,
+      "seed": 42,
+      "rms": 0.0012000000569969416,
+      "peak": 0.002398074371740222
+    },
+    "multi_scratch": {
+      "training_carriers": [
+        "rain",
+        "fan",
+        "wind"
+      ],
+      "carrier_config": {
+        "rain": {
+          "carrier_rms": 0.005,
+          "residual_gain": 1.0
+        },
+        "fan": {
+          "carrier_rms": 0.01,
+          "residual_gain": 0.75
+        },
+        "wind": {
+          "carrier_rms": 0.01,
+          "residual_gain": 1.0
+        }
+      },
+      "initialization": "zeros",
+      "phase_robust": true,
+      "epochs": 80,
+      "learning_rate": 1e-05,
+      "steps_per_epoch": 12,
+      "seed": 42,
+      "rms": 0.0012000000569969416,
+      "peak": 0.002398531185463071
+    },
+    "multi_scratch_320": {
+      "training_carriers": [
+        "rain",
+        "fan",
+        "wind"
+      ],
+      "carrier_config": {
+        "rain": {
+          "carrier_rms": 0.005,
+          "residual_gain": 1.0
+        },
+        "fan": {
+          "carrier_rms": 0.01,
+          "residual_gain": 0.75
+        },
+        "wind": {
+          "carrier_rms": 0.01,
+          "residual_gain": 1.0
+        }
+      },
+      "initialization": "zeros",
+      "epochs": 320,
+      "convergence_observed_around_epoch": 250,
+      "phase_robust": true,
+      "rms": 0.0012000000569969416,
+      "peak": 0.002398531185463071
+    },
+    "keystroke_only_phase_320": {
+      "training_carriers": [],
+      "initialization": "zeros",
+      "phase_robust": true,
+      "epochs": 320,
+      "steps_per_epoch": 12,
+      "learning_rate": 1e-05,
+      "seed": 42,
+      "rms": 0.0012000000569969416,
+      "peak": 0.0023950953036546707
+    }
+  },
+  "recommended_playback": {
+    "rain": {
+      "residual": "rain_phase",
+      "carrier_rms": 0.003,
+      "residual_scale": 1.0,
+      "status": "Original rain configuration"
+    },
+    "fan": {
+      "residual": "rain_phase",
+      "carrier_rms": 0.01,
+      "residual_scale": 0.75,
+      "status": "Preferred in informal listening"
+    },
+    "wind": {
+      "residual": "rain_phase",
+      "carrier_rms": 0.01,
+      "residual_scale": 1.0,
+      "status": "Preferred for attack effectiveness; perceptually similar"
+    }
+  }
+}

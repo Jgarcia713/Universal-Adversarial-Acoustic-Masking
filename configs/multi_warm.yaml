@@ -1,0 +1,25 @@
+run_name: multi_warm_80_v1
+kind: carrier_aware
+seed: 42
+data_seed: 42
+reshuffle_each_iteration: true
+model: artifacts/models/keystroke_cnn.keras
+dataset: artifacts/models/keystroke_dataset.npz
+batch_size: 32
+epochs: 80
+steps_per_epoch: 12
+learning_rate: 0.00001
+rms_budget: 0.0012
+peak_budget: 0.0024
+init_mode: zero
+# Point this to the extracted rain_phase.npy from the existing residual bank:
+initial_residual: artifacts/masks/rain_phase.npy
+output_dir: artifacts/runs
+carriers:
+  rain: artifacts/carriers/rain.wav
+  fan: artifacts/carriers/fan.wav
+  wind: artifacts/carriers/wind.wav
+carrier_config:
+  rain: {carrier_rms: 0.005, residual_gain: 1.0}
+  fan: {carrier_rms: 0.010, residual_gain: 0.75}
+  wind: {carrier_rms: 0.010, residual_gain: 1.0}

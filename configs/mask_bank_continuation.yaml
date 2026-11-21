@@ -1,0 +1,18 @@
+training_config: configs/multi_scratch.yaml
+evaluation_config: configs/evaluation.yaml
+output_dir: artifacts/runs/mask_bank_continuation
+pilot_output_dir: artifacts/runs/mask_bank_pilot
+reference_key: multi_scratch
+reference_run: artifacts/runs/multi_scratch_320_v1/residual.npy
+seeds: [101, 202, 303, 404]
+epochs: 320
+checkpoints: [180, 240, 320]
+evaluation_repeats: 8
+initialization_rms: 0.0003
+accuracy_tolerance_pp: 2.0
+loudness_scales: [1.0]
+duplicate_correlation: 0.90
+duplicate_spectral_distance: 0.05
+duplicate_prediction_disagreement: 0.05
+min_admitted_for_expansion: 6
+near_equivalence_pp: 1.0
