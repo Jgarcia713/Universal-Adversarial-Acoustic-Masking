@@ -5,6 +5,7 @@ input-sounds/
 artifacts/evaluation
 artifacts/runs
 !artifacts/.gitkeep
+!artifacts/carriers/*.wav
 *.wav
 !tests/fixtures/*.wav
 
