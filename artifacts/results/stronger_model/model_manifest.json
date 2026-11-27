@@ -1,0 +1,111 @@
+{
+  "model_id": "factored",
+  "summary": "Factored-convolution CNN for 26 letters, trained on keystroke_dataset.npz train_idx; second model for the mask-transfer study",
+  "model_file": {
+    "path": "artifacts/models/factored_cnn.keras",
+    "sha256": "b23b1b4abe2183fc8c0d21157ae269afe04b24241963dc852b285ab587f64bd3",
+    "size_bytes": 158039500,
+    "in_git": false,
+    "location": "https://drive.google.com/file/d/1J1M8Gr1_fUtWmpMIRabZAvv1puJN3T6v/view?usp=sharing",
+    "note": "Includes the Adam optimizer state. Every result in artifacts/results/stronger_model came from this exact file."
+  },
+  "reference_model": {
+    "path": "artifacts/models/keystroke_cnn.keras",
+    "sha256": "42e7cfc86cb5389b052ddfae9a992a3e880580fb3bea3611cbf29adf29fa535e",
+    "parameters": 490778,
+    "note": "Original CNN, unchanged. The masks were optimised against this model only."
+  },
+  "parameters": 13164794,
+  "input": {
+    "shape": [
+      null,
+      64,
+      50,
+      1
+    ],
+    "dtype": "float32",
+    "features": "acoustic_masking.preprocessing.LogMel or librosa_log_mel",
+    "preprocessing_config": "artifacts/models/preprocessing_config.json"
+  },
+  "output": {
+    "shape": [
+      null,
+      26
+    ],
+    "type": "probabilities",
+    "activation": "softmax",
+    "classes": [
+      "a",
+      "b",
+      "c",
+      "d",
+      "e",
+      "f",
+      "g",
+      "h",
+      "i",
+      "j",
+      "k",
+      "l",
+      "m",
+      "n",
+      "o",
+      "p",
+      "q",
+      "r",
+      "s",
+      "t",
+      "u",
+      "v",
+      "w",
+      "x",
+      "y",
+      "z"
+    ],
+    "label_mapping": "index i is CLASSES[i]: 0=a ... 25=z"
+  },
+  "dataset": {
+    "path": "artifacts/models/keystroke_dataset.npz",
+    "sha256": "ca37915ea1867d68cb49e5072d6b5ed6c4de0e5b13cf5407df55f42b1fc31c75",
+    "splits": {
+      "train_idx": 2275,
+      "val_idx": 487,
+      "test_idx": 488
+    },
+    "split_overlap": "none (checked)"
+  },
+  "training_record": {
+    "settings": "artifacts/results/stronger_model/config.yaml",
+    "metrics": "artifacts/models/factored_cnn.json",
+    "history": "artifacts/models/factored_cnn_history.csv",
+    "environment": "artifacts/models/factored_cnn_environment.json"
+  },
+  "results": {
+    "clean": "artifacts/results/stronger_model/clean/",
+    "transfer": "artifacts/results/stronger_model/transfer/",
+    "notes": "artifacts/results/stronger_model/notes.md"
+  },
+  "not_in_git": [
+    {
+      "path": "artifacts/models/factored_cnn.keras",
+      "reason": "158 MB, over GitHub's 100 MB limit; shared on Google Drive"
+    },
+    {
+      "path": "artifacts/models/factored_cnn_best.keras",
+      "sha256": "ac91662ce44f9a4ec6d38b794c2c5be2dcba3b60dc2fec32286904ba23c5fbe8",
+      "reason": "Training checkpoint; weights bitwise-identical to factored_cnn.keras (checked), so not shared"
+    },
+    {
+      "path": "artifacts/evaluation/transfer_cnn/predictions.csv",
+      "sha256": "b232f97484f40aae414b24e46bf55a4740bf07584a02ce4ca929d05c72688118",
+      "size_bytes": 77286345,
+      "reason": "Per-prediction output; artifacts/evaluation is gitignored by the repo. Regenerate with the evaluate commands in notes.md"
+    },
+    {
+      "path": "artifacts/evaluation/transfer_factored/predictions.csv",
+      "sha256": "c66b94edff06175cd5e395a0f349701b12df160f7247a3cbb32fbb01610c301b",
+      "size_bytes": 75593430,
+      "reason": "Per-prediction output; artifacts/evaluation is gitignored by the repo. Regenerate with the evaluate commands in notes.md"
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+model_a,model_b,n_examples,both_correct,a_only_correct,b_only_correct,both_wrong,accuracy_difference,mcnemar_exact_p
+cnn,factored,488,488,0,0,0,0.0,1.0

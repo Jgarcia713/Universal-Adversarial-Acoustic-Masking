@@ -4,6 +4,8 @@ input-sounds/
 *.egg-info/
 artifacts/evaluation
 artifacts/runs
+# Factored CNN model files are 158 MB (GitHub's limit is 100 MB); the model is shared on Google Drive.
+artifacts/models/factored_cnn*.keras
 !artifacts/.gitkeep
 !artifacts/carriers/*.wav
 *.wav

@@ -1,0 +1,12 @@
+{
+  "arch": "factored",
+  "seed": 42,
+  "max_epochs": 50,
+  "epochs_run": 34,
+  "batch_size": 32,
+  "parameters": 13164794,
+  "test_accuracy": 1.0,
+  "test_loss": 0.0009082272881641984,
+  "dataset_sha256": "ca37915ea1867d68cb49e5072d6b5ed6c4de0e5b13cf5407df55f42b1fc31c75",
+  "model_sha256": "b23b1b4abe2183fc8c0d21157ae269afe04b24241963dc852b285ab587f64bd3"
+}
