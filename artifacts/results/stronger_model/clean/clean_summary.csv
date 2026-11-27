@@ -1,0 +1,3 @@
+model_id,model_path,model_sha256,split,n_examples,n_correct,accuracy,macro_f1
+cnn,artifacts/models/keystroke_cnn.keras,42e7cfc86cb5389b052ddfae9a992a3e880580fb3bea3611cbf29adf29fa535e,test,488,488,1.0,1.0
+factored,artifacts/models/factored_cnn.keras,b23b1b4abe2183fc8c0d21157ae269afe04b24241963dc852b285ab587f64bd3,test,488,488,1.0,1.0

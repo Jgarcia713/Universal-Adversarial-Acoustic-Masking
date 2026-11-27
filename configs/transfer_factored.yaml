@@ -1,0 +1,62 @@
+# Mask-transfer evaluation for the 'factored' classifier.
+# Identical to configs/evaluation.yaml (same seed, so identical keystrokes, carrier windows
+# and phases) except for model, output_dir, and the 32 candidate-bank masks added below.
+# transfer_cnn.yaml and transfer_factored.yaml differ ONLY in model and output_dir.
+seed: 20261116
+model: artifacts/models/factored_cnn.keras
+dataset: artifacts/models/keystroke_dataset.npz
+keystroke_split: test  # HISTORICAL DEVELOPMENT SET; NOT a pristine final test
+carrier_split: val
+batch_size: 32
+repeats: 30
+playback_scale: 0.90
+noise_rms: 0.0012
+noise_peak: 0.0024
+clip_mixtures: false  # Preserve paired notebook numbers. New controlled tests: true.
+output_dir: artifacts/evaluation/transfer_factored
+carriers: {rain: artifacts/carriers/rain.wav, fan: artifacts/carriers/fan.wav, wind: artifacts/carriers/wind.wav}
+carrier_config:
+  rain: {carrier_rms: 0.005, residual_gain: 1.0}
+  fan: {carrier_rms: 0.010, residual_gain: 0.75}
+  wind: {carrier_rms: 0.010, residual_gain: 1.0}
+residuals:
+  original_uap:
+    path: artifacts/masks/uap_epsilon_001.npy
+    match_budget: true
+  keystroke_only: {bank: artifacts/masks/residual_bank.npz, key: keystroke_only_phase_320}
+  rain_baseline: {bank: artifacts/masks/residual_bank.npz, key: rain_phase}
+  multi_warm: {bank: artifacts/masks/residual_bank.npz, key: multi_warm}
+  multi_scratch: {bank: artifacts/masks/residual_bank.npz, key: multi_scratch}
+  # 32 candidate-bank masks (raw waveforms; same gain as above)
+  random_101: {bank: artifacts/masks/candidate_bank.npz, key: random_101}
+  random_202: {bank: artifacts/masks/candidate_bank.npz, key: random_202}
+  random_2101: {bank: artifacts/masks/candidate_bank.npz, key: random_2101}
+  random_2102: {bank: artifacts/masks/candidate_bank.npz, key: random_2102}
+  random_2103: {bank: artifacts/masks/candidate_bank.npz, key: random_2103}
+  random_2104: {bank: artifacts/masks/candidate_bank.npz, key: random_2104}
+  random_2105: {bank: artifacts/masks/candidate_bank.npz, key: random_2105}
+  random_2106: {bank: artifacts/masks/candidate_bank.npz, key: random_2106}
+  random_2107: {bank: artifacts/masks/candidate_bank.npz, key: random_2107}
+  random_2108: {bank: artifacts/masks/candidate_bank.npz, key: random_2108}
+  random_2109: {bank: artifacts/masks/candidate_bank.npz, key: random_2109}
+  random_2110: {bank: artifacts/masks/candidate_bank.npz, key: random_2110}
+  random_2111: {bank: artifacts/masks/candidate_bank.npz, key: random_2111}
+  random_2112: {bank: artifacts/masks/candidate_bank.npz, key: random_2112}
+  random_303: {bank: artifacts/masks/candidate_bank.npz, key: random_303}
+  random_404: {bank: artifacts/masks/candidate_bank.npz, key: random_404}
+  zero_101: {bank: artifacts/masks/candidate_bank.npz, key: zero_101}
+  zero_1101: {bank: artifacts/masks/candidate_bank.npz, key: zero_1101}
+  zero_1102: {bank: artifacts/masks/candidate_bank.npz, key: zero_1102}
+  zero_1103: {bank: artifacts/masks/candidate_bank.npz, key: zero_1103}
+  zero_1104: {bank: artifacts/masks/candidate_bank.npz, key: zero_1104}
+  zero_1105: {bank: artifacts/masks/candidate_bank.npz, key: zero_1105}
+  zero_1106: {bank: artifacts/masks/candidate_bank.npz, key: zero_1106}
+  zero_1107: {bank: artifacts/masks/candidate_bank.npz, key: zero_1107}
+  zero_1108: {bank: artifacts/masks/candidate_bank.npz, key: zero_1108}
+  zero_1109: {bank: artifacts/masks/candidate_bank.npz, key: zero_1109}
+  zero_1110: {bank: artifacts/masks/candidate_bank.npz, key: zero_1110}
+  zero_1111: {bank: artifacts/masks/candidate_bank.npz, key: zero_1111}
+  zero_1112: {bank: artifacts/masks/candidate_bank.npz, key: zero_1112}
+  zero_202: {bank: artifacts/masks/candidate_bank.npz, key: zero_202}
+  zero_303: {bank: artifacts/masks/candidate_bank.npz, key: zero_303}
+  zero_404: {bank: artifacts/masks/candidate_bank.npz, key: zero_404}

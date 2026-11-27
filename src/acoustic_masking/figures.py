@@ -30,3 +30,42 @@ def plot_top_errors(predictions_csv,carrier="fan",top_n=12,output=None):
     plt.tight_layout()
     if output:plt.savefig(output,dpi=180,bbox_inches="tight")
     else:plt.show()
+
+# Categorical slots from the validated reference palette (light mode), in fixed order.
+SERIES_COLORS = ["#257de0","#f47230","#00b894","#f2a600","#ee7fac","#008a17","#6a4ce2","#ec4647"]
+TRANSFER_CONDITIONS = {"carrier_only":"Carrier\nonly","random_noise":"Random\nnoise",
+                       "original_uap":"Original\nUAP","multi_scratch":"Multi-carrier\n(scratch)",
+                       "bank_mean":"Bank mean\n(32 masks)"}
+
+def plot_transfer(comparison_csv,output=None,model_labels=None,conditions=TRANSFER_CONDITIONS):
+    """Grouped bars of mean accuracy per condition: one panel per carrier, one color per model."""
+    import numpy as np
+    df=pd.read_csv(comparison_csv)
+    models=[c[len("accuracy_"):] for c in df.columns if c.startswith("accuracy_")]
+    if len(models)>len(SERIES_COLORS): raise ValueError("Too many models for one chart")
+    model_labels=model_labels or {}
+    carriers=list(dict.fromkeys(df.carrier))
+    fig,axes=plt.subplots(1,len(carriers),figsize=(4.3*len(carriers),4.2),sharey=True,squeeze=False)
+    x=np.arange(len(conditions));width=0.6/len(models)
+    for ax,carrier in zip(axes[0],carriers):
+        sub=df[df.carrier==carrier].set_index("condition").reindex(list(conditions))
+        for i,model in enumerate(models):
+            ax.bar(x+(i-(len(models)-1)/2)*width,sub[f"accuracy_{model}"],width,color=SERIES_COLORS[i],
+                   edgecolor="white",linewidth=2,label=model_labels.get(model,model))
+        ax.set_title(carrier.capitalize(),fontsize=11,color="#191919",loc="left")
+        ax.set_xticks(x,list(conditions.values()),fontsize=8,color="#666666")
+        ax.set_ylim(0,1);ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda v,_:f"{v:.0%}"))
+        ax.tick_params(axis="y",labelsize=8,colors="#666666",length=0);ax.tick_params(axis="x",length=0)
+        ax.yaxis.grid(True,color="#e6e6e6",linewidth=0.8);ax.set_axisbelow(True)
+        for side in ("top","right","left"):ax.spines[side].set_visible(False)
+        ax.spines["bottom"].set_color("#bbbbbb")
+    axes[0][0].set_ylabel("Letter accuracy (lower = masking works better)",fontsize=9,color="#666666")
+    fig.tight_layout(rect=(0,0,1,0.86))
+    handles,labels=axes[0][0].get_legend_handles_labels()
+    fig.legend(handles,labels,loc="upper left",bbox_to_anchor=(0.005,0.94),ncol=len(models),
+               frameon=False,fontsize=9,handlelength=1.2,columnspacing=1.6)
+    fig.suptitle("Do masks optimised against the original CNN transfer to a new model?",
+                 x=0.01,y=0.995,ha="left",fontsize=12,color="#191919")
+    if output:fig.savefig(output,dpi=200,bbox_inches="tight",facecolor="white")
+    else:plt.show()
+    plt.close(fig)

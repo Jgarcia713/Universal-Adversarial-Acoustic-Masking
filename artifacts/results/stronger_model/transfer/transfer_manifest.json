@@ -1,0 +1,19 @@
+{
+  "runs": {
+    "cnn": {
+      "evaluation_dir": "artifacts/evaluation/transfer_cnn",
+      "model": "artifacts/models/keystroke_cnn.keras",
+      "model_sha256": "42e7cfc86cb5389b052ddfae9a992a3e880580fb3bea3611cbf29adf29fa535e"
+    },
+    "factored": {
+      "evaluation_dir": "artifacts/evaluation/transfer_factored",
+      "model": "artifacts/models/factored_cnn.keras",
+      "model_sha256": "b23b1b4abe2183fc8c0d21157ae269afe04b24241963dc852b285ab587f64bd3"
+    }
+  },
+  "reference_model": "cnn",
+  "paired": "Verified identical keystrokes, carrier windows and residual phases across runs",
+  "drop_definition": "carrier_only accuracy minus condition accuracy, within the same repeat",
+  "transfer_ratio": "model drop / cnn drop (blank when the reference drop <= 0)",
+  "note": "Repeats vary carrier windows and phases over the same keystrokes; they are repeated measures"
+}

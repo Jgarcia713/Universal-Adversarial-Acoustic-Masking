@@ -1,7 +1,8 @@
 """Command-line entry point for the acoustic masking experiments.
 
 Dispatches commands to prepare data, train the classifier or a masking
-residual, evaluate saved waveforms, plot results, and extract a bank entry.
+residual, evaluate saved waveforms, compare classifiers on clean keystrokes
+and under masking, plot results, and extract a bank entry.
 Residual training and evaluation read input paths and settings from YAML.
 """
 import argparse
@@ -43,7 +44,7 @@ def train_classifier(args):
     from tensorflow import keras
     from acoustic_masking.data import load_dataset
     from acoustic_masking.preprocessing import librosa_log_mel
-    from acoustic_masking.models import build_cnn
+    from acoustic_masking.models import ARCHITECTURES
     from acoustic_masking.reproducibility import set_seed,save_environment,sha256
 
     set_seed(args.seed)
@@ -51,7 +52,7 @@ def train_classifier(args):
     features = np.stack([librosa_log_mel(wave) for wave in data['waveforms']])[..., None]
     labels = data['labels']
     train, val, test = (data[key] for key in ('train_idx', 'val_idx', 'test_idx'))
-    model = build_cnn()
+    model = ARCHITECTURES[args.arch]()
     destination = Path(args.out)
     destination.parent.mkdir(parents=True, exist_ok=True)
     callbacks = [
@@ -60,22 +61,29 @@ def train_classifier(args):
             str(destination.with_name(f'{destination.stem}_best.keras')),
             monitor='val_loss', save_best_only=True,
         ),
+        keras.callbacks.CSVLogger(str(destination.with_name(f'{destination.stem}_history.csv'))),
     ]
-    model.fit(
+    history = model.fit(
         features[train], labels[train], validation_data=(features[val], labels[val]),
         epochs=args.epochs, batch_size=args.batch_size, callbacks=callbacks, verbose=1,
     )
     model.save(destination)
     loss, accuracy = model.evaluate(features[test], labels[test], verbose=0)
     metrics = {
+        'arch': args.arch,
         'seed': args.seed,
+        'max_epochs': args.epochs,
+        'epochs_run': len(history.history['loss']),
+        'batch_size': args.batch_size,
+        'parameters': int(model.count_params()),
         'test_accuracy': float(accuracy),
         'test_loss': float(loss),
         'dataset_sha256': sha256(args.dataset),
         'model_sha256': sha256(destination),
     }
     destination.with_suffix('.json').write_text(json.dumps(metrics, indent=2), encoding='utf-8')
-    save_environment(destination.with_name('classifier_environment.json'))
+    # Named per model so training a second classifier doesn't overwrite another's record.
+    save_environment(destination.with_name(f'{destination.stem}_environment.json'))
     print(f'Saved {destination}. Within-dataset test accuracy: {accuracy:.4%}')
 
 
@@ -194,6 +202,102 @@ def evaluate(args):
     print(summary.to_string(index=False))
 
 
+def evaluate_clean(args):
+    import itertools
+    import pandas as pd
+    from sklearn.metrics import f1_score
+    from acoustic_masking.config import CLASSES
+    from acoustic_masking.data import load_dataset
+    from acoustic_masking.models import load_frozen
+    from acoustic_masking.preprocessing import LogMel
+    from acoustic_masking.evaluation import clean_predictions,confusion_matrix_frame,paired_clean_comparison
+    from acoustic_masking.reproducibility import sha256,save_environment
+
+    models = {}
+    for spec in args.model:
+        name, sep, path = spec.partition('=')
+        if not sep or not name or not path: raise ValueError(f'--model must be NAME=PATH, got {spec!r}')
+        if name in models: raise ValueError(f'Duplicate model name {name!r}')
+        models[name] = path
+    data = load_dataset(args.dataset)
+    indices = data[f'{args.split}_idx']
+    filenames = data.get('filenames')
+    if filenames is not None:
+        stems = [Path(str(f).replace('\\', '/')).name.split('_')[0] for f in filenames[indices]]
+        mismatched = sum(stem != CLASSES[label] for stem, label in zip(stems, data['labels'][indices]))
+        if mismatched: raise ValueError(f'{mismatched} labels disagree with their filenames')
+    log_mel = LogMel()
+    frames, summary = [], []
+    for name, path in models.items():
+        frame = clean_predictions(load_frozen(path), log_mel, data['waveforms'], data['labels'],
+                                  indices, name, filenames)
+        frames.append(frame)
+        summary.append({'model_id': name, 'model_path': path, 'model_sha256': sha256(path),
+                        'split': args.split, 'n_examples': len(frame), 'n_correct': int(frame.correct.sum()),
+                        'accuracy': float(frame.correct.mean()),
+                        'macro_f1': float(f1_score(frame.true_label, frame.predicted_label,
+                                                   labels=range(len(CLASSES)), average='macro'))})
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    predictions = pd.concat(frames, ignore_index=True)
+    predictions.to_csv(out / 'clean_predictions.csv', index=False)
+    for frame in frames:
+        confusion_matrix_frame(frame.true_label, frame.predicted_label).to_csv(
+            out / f'confusion_{frame.model_id.iloc[0]}.csv')
+    pd.DataFrame(summary).to_csv(out / 'clean_summary.csv', index=False)
+    pairs = []
+    for a, b in itertools.combinations(frames, 2):
+        if not (a.dataset_index.to_numpy() == b.dataset_index.to_numpy()).all():
+            raise ValueError('Models were not evaluated on the same examples')
+        pairs.append({'model_a': a.model_id.iloc[0], 'model_b': b.model_id.iloc[0],
+                      **paired_clean_comparison(a.correct, b.correct)})
+    if pairs: pd.DataFrame(pairs).to_csv(out / 'paired_comparison.csv', index=False)
+    manifest = {'dataset': args.dataset, 'dataset_sha256': sha256(args.dataset), 'split': args.split,
+                'models': models, 'features': 'acoustic_masking.preprocessing.LogMel',
+                'note': 'Nominal test split was used during mask development; report as development evaluation'}
+    (out / 'clean_manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
+    save_environment(out / 'environment.json')
+    print(pd.DataFrame(summary)[['model_id', 'n_correct', 'n_examples', 'accuracy', 'macro_f1']].to_string(index=False))
+    if pairs: print(pd.DataFrame(pairs).to_string(index=False))
+
+
+def summarize_transfer(args):
+    import pandas as pd
+    from acoustic_masking.evaluation import transfer_tables
+    from acoustic_masking.figures import plot_transfer
+
+    runs, sources = {}, {}
+    for spec in args.evaluations:
+        name, sep, folder = spec.partition('=')
+        if not sep or not name or not folder: raise ValueError(f'--evaluation must be NAME=DIR, got {spec!r}')
+        if name in runs: raise ValueError(f'Duplicate run name {name!r}')
+        manifest = json.loads((Path(folder) / 'evaluation_manifest.json').read_text(encoding='utf-8'))
+        predictions = pd.read_csv(Path(folder) / 'predictions.csv')
+        runs[name] = (predictions, manifest['config'], manifest['model_sha256'])
+        sources[name] = {'evaluation_dir': folder, 'model': manifest['config']['model'],
+                         'model_sha256': manifest['model_sha256']}
+    if args.reference and args.reference not in runs: raise ValueError(f'Unknown reference {args.reference!r}')
+    by_repeat, summary, comparison = transfer_tables(runs, reference=args.reference)
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    by_repeat.to_csv(out / 'mask_transfer_by_carrier.csv', index=False)
+    summary.to_csv(out / 'transfer_summary.csv', index=False)
+    comparison.to_csv(out / 'transfer_comparison.csv', index=False)
+    labels = {'cnn': 'Original CNN (masks optimised against it)', 'factored': 'Factored CNN (new, unseen by masks)'}
+    plot_transfer(out / 'transfer_comparison.csv', out / 'transfer_by_carrier.png', model_labels=labels)
+    reference = args.reference or next(iter(runs))
+    (out / 'transfer_manifest.json').write_text(json.dumps({
+        'runs': sources, 'reference_model': reference,
+        'paired': 'Verified identical keystrokes, carrier windows and residual phases across runs',
+        'drop_definition': 'carrier_only accuracy minus condition accuracy, within the same repeat',
+        'transfer_ratio': f'model drop / {reference} drop (blank when the reference drop <= 0)',
+        'note': 'Repeats vary carrier windows and phases over the same keystrokes; they are repeated measures',
+    }, indent=2), encoding='utf-8')
+    show = comparison[comparison.condition.isin(['carrier_only', 'random_noise', 'original_uap', 'multi_scratch', 'bank_mean'])]
+    print(show.to_string(index=False, float_format=lambda v: f'{v:.4f}'))
+    print(f'Wrote {out}')
+
+
 def plot_results(args):
     from acoustic_masking.figures import plot_accuracy,plot_top_errors
 
@@ -237,6 +341,8 @@ def main(argv=None):
     command = commands.add_parser("train-classifier", help="Train the keystroke classifier")
     command.add_argument('--dataset', required=True)
     command.add_argument('--out', default='artifacts/models/keystroke_cnn_new.keras')
+    command.add_argument('--arch', choices=['cnn', 'factored'], default='cnn',
+                         help="'cnn' = original small CNN; 'factored' = factored-convolution CNN from the notebook")
     command.add_argument('--seed', type=int, default=42)
     command.add_argument('--epochs', type=int, default=30)
     command.add_argument('--batch-size', type=int, default=32)
@@ -249,6 +355,21 @@ def main(argv=None):
     command = commands.add_parser("evaluate", help="Evaluate masks on paired carrier windows")
     command.add_argument('--config', required=True)
     command.set_defaults(run=evaluate)
+
+    command = commands.add_parser("evaluate-clean", help="Compare classifiers on the same unmasked keystrokes")
+    command.add_argument('--model', action='append', required=True, metavar='NAME=PATH',
+                         help='Repeat once per model, e.g. --model cnn=artifacts/models/keystroke_cnn.keras')
+    command.add_argument('--dataset', default='artifacts/models/keystroke_dataset.npz')
+    command.add_argument('--split', choices=['train', 'val', 'test'], default='test')
+    command.add_argument('--out', required=True)
+    command.set_defaults(run=evaluate_clean)
+
+    command = commands.add_parser("summarize-transfer", help="Compare paired masking evaluations of several classifiers")
+    command.add_argument('--evaluation', dest='evaluations', action='append', required=True, metavar='NAME=DIR',
+                         help='Evaluation output folder; repeat per model. The first is the reference unless --reference is given')
+    command.add_argument('--reference', help='Model the masks were optimised against (default: first --run)')
+    command.add_argument('--out', required=True)
+    command.set_defaults(run=summarize_transfer)
 
     command = commands.add_parser("plot-results", help="Plot paired evaluation results")
     command.add_argument('--evaluation-dir', default='artifacts/evaluation')

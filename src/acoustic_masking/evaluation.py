@@ -7,7 +7,7 @@ repeat-level and aggregate accuracy, and prediction concentration metrics.
 import numpy as np
 import pandas as pd
 from .audio import rms, carrier_windows, phase_shift_batch, random_residual
-from .config import N_SAMPLES
+from .config import N_SAMPLES, CLASSES
 from .reproducibility import child_seeds
 
 
@@ -93,3 +93,114 @@ def prediction_concentration(predictions,target_class=1):
              "unique_classes":len(counts),"target_false_positive_rate":float((non_target.predicted_label==target_class).mean()),
              "target_recall":float((target.predicted_label==target_class).mean()) if len(target) else float('nan')})
     return pd.DataFrame(rows)
+
+
+def clean_predictions(model, log_mel, waveforms, labels, indices, model_id,
+                      filenames=None, batch_size=64):
+    """Predict unmasked keystrokes. One row per example, keyed by dataset index."""
+    import tensorflow as tf
+    indices=np.asarray(indices)
+    rows=[]
+    for start in range(0,len(indices),batch_size):
+        idx=indices[start:start+batch_size]
+        probs=np.asarray(model(log_mel(tf.convert_to_tensor(waveforms[idx],tf.float32)),training=False))
+        if probs.ndim!=2 or probs.shape[1]!=len(CLASSES): raise ValueError("Model must output [B,26]")
+        pred=probs.argmax(axis=1)
+        for j,i in enumerate(idx):
+            rows.append({"model_id":model_id,"dataset_index":int(i),
+                         "filename":"" if filenames is None else str(filenames[i]),
+                         "true_label":int(labels[i]),"predicted_label":int(pred[j]),
+                         "correct":bool(pred[j]==labels[i]),"confidence":float(probs[j,pred[j]])})
+    return pd.DataFrame(rows)
+
+
+def confusion_matrix_frame(true_labels, predicted_labels):
+    """26x26 counts; rows are true letters, columns are predicted letters."""
+    matrix=np.zeros((len(CLASSES),len(CLASSES)),dtype=int)
+    np.add.at(matrix,(np.asarray(true_labels,int),np.asarray(predicted_labels,int)),1)
+    return pd.DataFrame(matrix,index=pd.Index(CLASSES,name="true"),
+                        columns=pd.Index(CLASSES,name="predicted"))
+
+
+def paired_clean_comparison(correct_a, correct_b):
+    """Compare two models on the same examples using discordant pairs.
+
+    The exact McNemar p-value is a two-sided binomial test on the examples
+    exactly one model got right.
+    """
+    from scipy.stats import binomtest
+    a=np.asarray(correct_a,bool);b=np.asarray(correct_b,bool)
+    if a.shape!=b.shape or a.ndim!=1: raise ValueError("Paired results must be equal-length 1-D arrays")
+    a_only=int((a&~b).sum());b_only=int((~a&b).sum());discordant=a_only+b_only
+    return {"n_examples":int(len(a)),"both_correct":int((a&b).sum()),
+            "a_only_correct":a_only,"b_only_correct":b_only,"both_wrong":int((~a&~b).sum()),
+            "accuracy_difference":float(a.mean()-b.mean()),
+            "mcnemar_exact_p":float(binomtest(a_only,discordant,0.5).pvalue) if discordant else 1.0}
+
+
+def transfer_tables(runs, reference=None):
+    """Combine paired masking evaluations of several classifiers.
+
+    runs maps model_id -> (predictions DataFrame, evaluation config, model sha256).
+    Every run must share identical keystrokes, carrier windows and phases.
+
+    Returns three DataFrames. The first has one row per model, carrier,
+    condition and repeat. The second summarises across repeats. The third puts
+    the models side by side, where transfer_ratio is a model's mean accuracy
+    drop (relative to carrier_only in the same repeat) divided by the reference
+    model's drop. mask_id names the mask file, as "bank.npz:key" or a .npy path.
+    """
+    model_ids=list(runs);reference=reference or model_ids[0]
+    draw_keys=["carrier","repeat","sample_id","carrier_start","residual_phase"]
+    reference_draws=None;frames=[]
+    for model_id,(pred,cfg,model_sha) in runs.items():
+        draws=(pred.loc[pred.condition=="carrier_only",draw_keys]
+               .sort_values(draw_keys[:3]).reset_index(drop=True))
+        if reference_draws is None: reference_draws=draws
+        elif not draws.equals(reference_draws):
+            raise ValueError(f"{model_id} used different keystrokes, carrier windows or phases")
+        groups={"carrier_only":"control","random_noise":"control",
+                **{n:"bank" if "candidate_bank" in str(e.get("bank","")) else "historical"
+                   for n,e in cfg["residuals"].items()}}
+        mask_ids={"carrier_only":"none","random_noise":"generated:random_residual",
+                  **{n:f'{e["bank"]}:{e["key"]}' if "bank" in e else str(e.get("path",""))
+                     for n,e in cfg["residuals"].items()}}
+        playback=float(cfg.get("playback_scale",0.90))
+        gains={c:float(v["residual_gain"])*playback for c,v in cfg["carrier_config"].items()}
+        counts=(pred.groupby(["carrier","condition","repeat"],sort=False)["correct"]
+                .agg(n_examples="size",n_correct="sum").reset_index())
+        counts.insert(0,"model_id",model_id)
+        counts["mask_group"]=counts.condition.map(groups)
+        counts["mask_id"]=counts.condition.map(mask_ids)
+        counts["accuracy"]=counts.n_correct/counts.n_examples
+        counts["gain"]=[0.0 if cond=="carrier_only" else gains[c] for c,cond in zip(counts.carrier,counts.condition)]
+        counts["seed"]=int(cfg["seed"]);counts["clip_mixtures"]=bool(cfg.get("clip_mixtures",False))
+        counts["model_sha256"]=model_sha
+        frames.append(counts)
+    by_repeat=pd.concat(frames,ignore_index=True)
+    baseline=by_repeat[by_repeat.condition=="carrier_only"].set_index(["model_id","carrier","repeat"]).accuracy
+    keys=pd.MultiIndex.from_frame(by_repeat[["model_id","carrier","repeat"]])
+    by_repeat["drop_vs_carrier_only"]=baseline.reindex(keys).to_numpy()-by_repeat.accuracy.to_numpy()
+    bank=(by_repeat[by_repeat.mask_group=="bank"].groupby(["model_id","carrier","repeat"])
+          [["accuracy","drop_vs_carrier_only"]].mean().reset_index()
+          .assign(condition="bank_mean",mask_group="bank_mean"))
+    rows=pd.concat([by_repeat[bank.columns],bank],ignore_index=True)
+    summary=(rows.groupby(["model_id","carrier","mask_group","condition"])
+             .agg(repeats=("accuracy","size"),accuracy_mean=("accuracy","mean"),accuracy_std=("accuracy","std"),
+                  drop_mean=("drop_vs_carrier_only","mean"),drop_std=("drop_vs_carrier_only","std"))
+             .reset_index())
+    wide=summary.pivot(index=["carrier","mask_group","condition"],columns="model_id",
+                       values=["accuracy_mean","drop_mean"])
+    comparison=pd.DataFrame(index=wide.index)
+    for model_id in model_ids:
+        comparison[f"accuracy_{model_id}"]=wide[("accuracy_mean",model_id)]
+        comparison[f"drop_{model_id}"]=wide[("drop_mean",model_id)]
+    for model_id in model_ids:
+        if model_id==reference: continue
+        ref_drop=comparison[f"drop_{reference}"]
+        comparison[f"transfer_ratio_{model_id}"]=(comparison[f"drop_{model_id}"]/ref_drop).where(ref_drop>0)
+    # Handoff column order from docs/01_STRONGER_CLASSIFIER_TEAMMATE.md, then the extras.
+    lead=["model_id","carrier","condition","mask_id","repeat","n_examples","n_correct",
+          "accuracy","seed","gain","clip_mixtures"]
+    by_repeat=by_repeat[lead+[c for c in by_repeat.columns if c not in lead]]
+    return by_repeat,summary,comparison.reset_index()

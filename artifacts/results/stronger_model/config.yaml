@@ -1,0 +1,61 @@
+# Training record for the factored CNN (artifacts/models/factored_cnn.keras).
+# This is a record of the run, not an input file: the values come from the training code in
+# src/acoustic_masking/__main__.py and models.py, and from the run's own outputs
+# (artifacts/models/factored_cnn.json, factored_cnn_history.csv, factored_cnn_environment.json).
+# Reproduce with:
+#   PYTHONHASHSEED=42 python -m acoustic_masking train-classifier --arch factored \
+#     --dataset artifacts/models/keystroke_dataset.npz --out artifacts/models/factored_cnn.keras --seed 42 --epochs 50
+model_id: factored
+builder: acoustic_masking.models.build_factored_cnn
+source: notebooks/ZnanstveniRad_final.ipynb, cell 14 (architecture) and cell 19 (paper config 13 hyperparameters)
+changes_from_source: 26 letter classes; integer labels with sparse cross-entropy instead of one-hot; this repo's log-mel features
+hyperparameters:
+  filters: [32, 64]
+  dense_units: 256
+  dropout_conv: 0.2
+  dropout_dense: 0.4
+parameters: 13164794
+
+input:
+  shape: [64, 50, 1]
+  dtype: float32
+  features: acoustic_masking.preprocessing.librosa_log_mel  # numerically equal to LogMel; settings in artifacts/models/preprocessing_config.json
+output:
+  shape: [26]
+  type: probabilities  # softmax output layer
+  classes: a..z = 0..25
+
+data:
+  dataset: artifacts/models/keystroke_dataset.npz
+  dataset_sha256: ca37915ea1867d68cb49e5072d6b5ed6c4de0e5b13cf5407df55f42b1fc31c75
+  train: train_idx  # 2275 clips, the only data the weights were fitted on
+  validation: val_idx  # 487 clips, used only for early stopping
+  test: test_idx  # 488 clips, not used for training or model selection
+  split_overlap: none  # checked: the three index sets are disjoint and cover all 3250 clips
+  augmentation: none  # clean keystrokes only
+  sample_weights: none
+
+training:
+  loss: sparse_categorical_crossentropy
+  optimizer: Adam
+  learning_rate: 0.001
+  batch_size: 32
+  shuffle: true  # Keras default
+  max_epochs: 50
+  epochs_run: 34
+  early_stopping: {monitor: val_loss, patience: 5, restore_best_weights: true}
+  best_epoch: 29  # 1-based; row 28 of factored_cnn_history.csv, val_loss 0.00106, val_accuracy 1.0
+  checkpoint: {file: artifacts/models/factored_cnn_best.keras, monitor: val_loss, save_best_only: true}
+
+seeds:
+  seed: 42  # Python, NumPy and TensorFlow, via acoustic_masking.reproducibility.set_seed
+  PYTHONHASHSEED: 42
+  tensorflow_op_determinism: true
+
+environment:
+  python: 3.12.10
+  tensorflow: 2.20.0
+  keras: 3.15.1
+  numpy: 2.5.5
+  librosa: 0.11.0
+  device: CPU only, Windows 11 laptop (4-core Intel i5-8365U), about 20 s per epoch

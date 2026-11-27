@@ -1,0 +1,11 @@
+{
+  "dataset": "artifacts/models/keystroke_dataset.npz",
+  "dataset_sha256": "ca37915ea1867d68cb49e5072d6b5ed6c4de0e5b13cf5407df55f42b1fc31c75",
+  "split": "test",
+  "models": {
+    "cnn": "artifacts/models/keystroke_cnn.keras",
+    "factored": "artifacts/models/factored_cnn.keras"
+  },
+  "features": "acoustic_masking.preprocessing.LogMel",
+  "note": "Nominal test split was used during mask development; report as development evaluation"
+}
